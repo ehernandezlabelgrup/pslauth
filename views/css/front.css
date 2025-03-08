@@ -1,0 +1,176 @@
+/**
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ *
+ * @author    Emilio Hernandez <ehernandez@okoiagency.com>
+ * @copyright OKOI AGENCY S.L.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+
+/* PSLAuth module styles */
+.pslauth-form {
+    margin-bottom: 2rem;
+}
+
+#pslauth-messages {
+    margin-bottom: 1.5rem;
+}
+
+.pslauth-form-title {
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+#pslauth-login-form,
+#pslauth-register-form {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+#pslauth-login-form .form-group,
+#pslauth-register-form .form-group {
+    margin-bottom: 1.25rem;
+}
+
+#pslauth-login-form label,
+#pslauth-register-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+#pslauth-login-form input[type="email"],
+#pslauth-login-form input[type="password"],
+#pslauth-register-form input[type="text"],
+#pslauth-register-form input[type="email"],
+#pslauth-register-form input[type="password"] {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+#pslauth-login-form input[type="email"]:focus,
+#pslauth-login-form input[type="password"]:focus,
+#pslauth-register-form input[type="text"]:focus,
+#pslauth-register-form input[type="email"]:focus,
+#pslauth-register-form input[type="password"]:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.pslauth-form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.pslauth-alternative-action {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+/* Error message styling */
+.pslauth-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 0.25rem;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+/* Success message styling */
+.pslauth-success {
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 0.25rem;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+/* Responsive layout adjustments */
+@media (min-width: 768px) {
+    #pslauth-login-form,
+    #pslauth-register-form {
+        max-width: 80%;
+    }
+}
+
+@media (min-width: 992px) {
+    #pslauth-login-form,
+    #pslauth-register-form {
+        max-width: 70%;
+    }
+}
+
+/* Button styling */
+.pslauth-button {
+    display: inline-block;
+    font-weight: 400;
+    color: #fff;
+    text-align: center;
+    vertical-align: middle;
+    background-color: #007bff;
+    border: 1px solid #007bff;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, 
+                border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    cursor: pointer;
+}
+
+.pslauth-button:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+.pslauth-button:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+}
+
+.pslauth-button:disabled {
+    opacity: 0.65;
+    pointer-events: none;
+}
+
+/* Remember me checkbox styling */
+.pslauth-remember-me {
+    display: flex;
+    align-items: center;
+}
+
+.pslauth-remember-me input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+/* Password field with visibility toggle */
+.pslauth-password-container {
+    position: relative;
+}
+
+.pslauth-password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6c757d;
+}
+
+.pslauth-password-toggle:hover {
+    color: #343a40;
+}
