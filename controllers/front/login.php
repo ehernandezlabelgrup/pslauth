@@ -71,5 +71,11 @@ class PSLAuthLoginModuleFrontController extends ModuleFrontController
             'modules/'.$this->module->name.'/views/js/login.js',
             ['position' => 'bottom', 'priority' => 200]
         );
+
+        $this->registerStylesheet(
+            'module-pslauth-login',
+            'modules/'.$this->module->name.'/views/css/front.css',
+            ['media' => 'all', 'priority' => 200]
+        );
     }
 }

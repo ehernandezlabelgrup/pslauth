@@ -72,13 +72,13 @@
 
     <hr>
 
-    <div class="no-account">
+    <div class="no-account pslauth-no-account">
       <a href="{$link->getModuleLink('pslauth', 'register', [], true)}" class="btn btn-outline-primary">
         {l s='No account? Create one here' mod='pslauth'}
       </a>
     </div>
 
-    <div class="forgot-password mt-3">
+    <div class="forgot-password pslauth-forgot-password mt-3">
       <a href="{$link->getPageLink('password')}" rel="nofollow">
         {l s='Forgot your password?' mod='pslauth'}
       </a>

@@ -174,3 +174,15 @@
 .pslauth-password-toggle:hover {
     color: #343a40;
 }
+
+.pslauth-no-account{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.forgot-password.pslauth-forgot-password {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
