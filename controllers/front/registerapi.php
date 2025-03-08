@@ -23,7 +23,7 @@ class PSLAuthRegisterApiModuleFrontController extends ModuleFrontController
     /**
      * @var bool If set to true, will be redirected to authentication page
      */
-    public $auth = false;
+    public $auth = true;
 
     /**
      * @var bool If set to false, page not found will be displayed
@@ -146,20 +146,7 @@ class PSLAuthRegisterApiModuleFrontController extends ModuleFrontController
             // Generate the redirect URL after registration
             $redirectUrl = $this->getRedirectUrl($data);
 
-            // If this is an API request, return the authentication token
-            if ($isApi) {
-                $customer = new Customer($user->id_customer);
-                $authToken = PSLAuthAPI::generateAuthToken($customer->id);
-                
-                return PSLAuthAPI::success([
-                    'token' => $authToken,
-                    'customer_id' => $customer->id,
-                    'email' => $customer->email,
-                    'firstname' => $customer->firstname,
-                    'lastname' => $customer->lastname,
-                    'redirect_url' => $redirectUrl
-                ], 'Registration successful');
-            }
+
 
             // For web requests, log the customer in automatically
             $customer = new Customer($user->id_customer);
@@ -174,6 +161,19 @@ class PSLAuthRegisterApiModuleFrontController extends ModuleFrontController
             $this->context->cookie->write();
             $this->context->cart->autosetProductAddress();
 
+			if ($isApi) {
+                $customer = new Customer($user->id_customer);
+                
+                return PSLAuthAPI::success([
+                    'customer_id' => $customer->id,
+                    'email' => $customer->email,
+                    'firstname' => $customer->firstname,
+                    'lastname' => $customer->lastname,
+                    'redirect_url' => $redirectUrl
+                ], 'Registration successful');
+            }
+			
+			
             // For AJAX requests, return success with redirect URL
             if ($isAjax) {
                 return PSLAuthAPI::success([

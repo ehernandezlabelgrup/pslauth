@@ -154,14 +154,15 @@
            </div>
          </section>
        </form>
+       {include file='module:pslauth/views/templates/front/social_buttons.tpl'}
      </section>
  
      <hr>
  
      <div class="login-instead pslauth-login-instead text-center mt-3">
-       <a href="{$link->getModuleLink('pslauth', 'login', [], true)}" class="btn btn-outline-primary">
-         {l s='Already have an account? Sign in instead' mod='pslauth'}
-       </a>
+     <a href="{$urls.base_url}auth/login" class="btn btn-outline-primary">
+     {l s='Already have an account? Sign in instead' mod='pslauth'}
+ </a>
      </div>
    </div>
  {/block}

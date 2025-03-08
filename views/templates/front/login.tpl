@@ -76,14 +76,15 @@
            </div>
          </section>
        </form>
+       {include file='module:pslauth/views/templates/front/social_buttons.tpl'}
      </section>
  
      <hr>
  
      <div class="no-account pslauth-no-account text-center mt-3">
-       <a href="{$link->getModuleLink('pslauth', 'register', [], true)}" class="btn btn-outline-primary">
-         {l s='No account? Create one here' mod='pslauth'}
-       </a>
+     <a href="{$urls.base_url}auth/register" class="btn btn-outline-primary">
+     {l s='No account? Create one here' mod='pslauth'}
+ </a>
      </div>
  
      <div class="forgot-password pslauth-forgot-password text-center mt-3">

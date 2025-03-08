@@ -186,3 +186,57 @@
     justify-content: center;
     align-items: center;
 }
+
+/* Social login buttons */
+.pslauth-social-buttons {
+    margin: 2rem 0;
+}
+
+.pslauth-social-separator {
+    text-align: center;
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.pslauth-social-separator:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #ddd;
+    z-index: 0;
+}
+
+.pslauth-social-separator span {
+    position: relative;
+    background-color: #fff;
+    padding: 0 1rem;
+    font-size: 0.9rem;
+    color: #777;
+    z-index: 1;
+}
+
+.pslauth-social-providers {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.pslauth-btn-google {
+    background-color: #4285f4;
+    color: #fff;
+}
+
+.pslauth-btn-google:hover {
+    background-color: #357ae8;
+    color: #fff;
+}
+
+/* Iconos para botones sociales */
+.icon-google:before {
+    content: "G";
+    font-weight: bold;
+    margin-right: 0.5rem;
+}

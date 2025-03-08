@@ -41,7 +41,7 @@ class PSLAuthLoginApiModuleFrontController extends ModuleFrontController
         // Check if this is an API request
         $isApi = PSLAuthAPI::isApi();
         $isAjax = PSLAuthAPI::isAjax();
-
+        
         // Only accept POST requests
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             if ($isApi || $isAjax) {
@@ -91,8 +91,6 @@ class PSLAuthLoginApiModuleFrontController extends ModuleFrontController
                         $pslAuthUser->email = $email;
                         $pslAuthUser->setPassword($password); // Hash password for PSLAuthUser
                         $pslAuthUser->auth_provider = 'email';
-                        $pslAuthUser->date_add = date('Y-m-d H:i:s');
-                        $pslAuthUser->date_upd = date('Y-m-d H:i:s');
                         
                         if ($pslAuthUser->add()) {
                             $pslAuthUser->updateLastLogin();
@@ -116,20 +114,6 @@ class PSLAuthLoginApiModuleFrontController extends ModuleFrontController
         // Generate the redirect URL after login
         $redirectUrl = $this->getRedirectUrl($data);
 
-        // If this is an API request, return the authentication token
-        if ($isApi) {
-            $authToken = PSLAuthAPI::generateAuthToken($customer->id);
-            
-            return PSLAuthAPI::success([
-                'token' => $authToken,
-                'customer_id' => $customer->id,
-                'email' => $customer->email,
-                'firstname' => $customer->firstname,
-                'lastname' => $customer->lastname,
-                'redirect_url' => $redirectUrl
-            ], 'Authentication successful');
-        }
-
         // For web requests, create the customer session
         $this->context->updateCustomer($customer);
         Hook::exec('actionAuthentication', ['customer' => $this->context->customer]);
@@ -142,9 +126,16 @@ class PSLAuthLoginApiModuleFrontController extends ModuleFrontController
         $this->context->cookie->write();
         $this->context->cart->autosetProductAddress();
 
-        // Handle "stay logged in" option
-        if ($stayLoggedIn) {
-            $this->context->cookie->setExpiration(time() + (60 * 60 * 24 * 30)); // 30 days
+		
+		 if ($isApi) {
+            
+            return PSLAuthAPI::success([
+                'customer_id' => $customer->id,
+                'email' => $customer->email,
+                'firstname' => $customer->firstname,
+                'lastname' => $customer->lastname,
+                'redirect_url' => $redirectUrl
+            ], 'Authentication successful');
         }
 
         // For AJAX requests, return success with redirect URL

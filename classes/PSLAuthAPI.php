@@ -105,7 +105,7 @@ class PSLAuthAPI
      */
     public static function isApi()
     {
-        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';;
         return strpos($requestUri, '/api/') !== false || 
                isset($_SERVER['HTTP_X_API_REQUEST']) || 
                (isset($_GET['fc']) && $_GET['fc'] === 'api');
