@@ -18,6 +18,7 @@ if (!defined('_PS_VERSION_')) {
 
 require_once dirname(__FILE__) . '/../../classes/PSLAuthSocialProvider.php';
 require_once dirname(__FILE__) . '/../../classes/PSLAuthGoogleProvider.php';
+require_once dirname(__FILE__) . '/../../classes/PSLAuthAppleProvider.php';
 
 class PSLAuthSocialModuleFrontController extends ModuleFrontController
 {
@@ -51,6 +52,10 @@ class PSLAuthSocialModuleFrontController extends ModuleFrontController
                 $this->processGoogleLogin();
                 break;
             
+            case 'apple':
+                $this->processAppleLogin();
+                break;
+            
             default:
                 // Invalid provider, redirect to login page
                 Tools::redirect($this->context->link->getModuleLink('pslauth', 'login'));
@@ -67,6 +72,23 @@ class PSLAuthSocialModuleFrontController extends ModuleFrontController
         
         if (!$provider->isEnabled()) {
             $this->errors[] = $this->trans('Google login is not enabled', [], 'Modules.Pslauth.Shop');
+            $this->redirectWithNotifications($this->context->link->getModuleLink('pslauth', 'login'));
+            return;
+        }
+        
+        $authUrl = $provider->getAuthUrl();
+        Tools::redirect($authUrl);
+    }
+    
+    /**
+     * Process Apple login
+     */
+    protected function processAppleLogin()
+    {
+        $provider = new PSLAuthAppleProvider();
+        
+        if (!$provider->isEnabled()) {
+            $this->errors[] = $this->trans('Apple login is not enabled', [], 'Modules.Pslauth.Shop');
             $this->redirectWithNotifications($this->context->link->getModuleLink('pslauth', 'login'));
             return;
         }

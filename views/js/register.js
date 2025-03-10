@@ -14,6 +14,19 @@
 document.addEventListener('DOMContentLoaded', function() {
     const registerForm = document.getElementById('pslauth-register-form');
     const messagesContainer = document.getElementById('pslauth-messages');
+    const passwordField = document.getElementById('pslauth-password');
+    const passwordStrengthContainer = document.createElement('div');
+    passwordStrengthContainer.className = 'password-strength-meter';
+    
+    // Add password strength meter container after password field
+    if (passwordField) {
+        passwordField.parentNode.insertBefore(passwordStrengthContainer, passwordField.nextSibling);
+        
+        // Add event listener for password input
+        passwordField.addEventListener('input', function() {
+            checkPasswordStrength(passwordField.value);
+        });
+    }
     
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
@@ -90,6 +103,72 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /**
+     * Check password strength and show visual feedback
+     * 
+     * @param {string} password The password to check
+     */
+    function checkPasswordStrength(password) {
+        // Initialize requirements
+        const requirements = [
+            { regex: /.{6,}/, description: 'At least 6 characters' },
+            { regex: /[a-z]/, description: 'At least one lowercase letter' },
+            { regex: /[A-Z]/, description: 'At least one uppercase letter' },
+            { regex: /[0-9]/, description: 'At least one number' },
+            { regex: /[^a-zA-Z0-9]/, description: 'At least one special character' }
+        ];
+        
+        // Clear previous content
+        passwordStrengthContainer.innerHTML = '';
+        
+        // Check which requirements are met
+        let strengthScore = 0;
+        const requirementsList = document.createElement('ul');
+        requirementsList.className = 'password-requirements';
+        
+        requirements.forEach(requirement => {
+            const isValid = requirement.regex.test(password);
+            if (isValid) strengthScore++;
+            
+            const listItem = document.createElement('li');
+            listItem.className = isValid ? 'requirement-met' : 'requirement-not-met';
+            listItem.innerHTML = `<i class="material-icons">${isValid ? 'check_circle' : 'cancel'}</i> ${requirement.description}`;
+            requirementsList.appendChild(listItem);
+        });
+        
+        // Calculate strength class
+        let strengthClass = 'strength-weak';
+        let strengthText = 'Weak';
+        
+        if (strengthScore >= 3) {
+            strengthClass = 'strength-medium';
+            strengthText = 'Medium';
+        }
+        if (strengthScore >= 5) {
+            strengthClass = 'strength-strong';
+            strengthText = 'Strong';
+        }
+        
+        // Create strength meter
+        const strengthBar = document.createElement('div');
+        strengthBar.className = `strength-meter ${strengthClass}`;
+        strengthBar.style.width = `${(strengthScore / 5) * 100}%`;
+        
+        // Create strength label
+        const strengthLabel = document.createElement('div');
+        strengthLabel.className = 'strength-text';
+        strengthLabel.textContent = `Password strength: ${strengthText}`;
+        
+        // Add all elements to container
+        const meterContainer = document.createElement('div');
+        meterContainer.className = 'meter-container';
+        meterContainer.appendChild(strengthBar);
+        
+        passwordStrengthContainer.appendChild(meterContainer);
+        passwordStrengthContainer.appendChild(strengthLabel);
+        passwordStrengthContainer.appendChild(requirementsList);
+    }
+    
+    /**
      * Basic client-side form validation
      * 
      * @param {Object} data Form data
@@ -114,10 +193,39 @@ document.addEventListener('DOMContentLoaded', function() {
             errors.push('Please enter a valid email address.');
         }
         
-        // Password length validation
-        if (data.password && data.password.length < 5) {
-            isValid = false;
-            errors.push('Password must be at least 5 characters long.');
+        // Password validation
+        if (data.password) {
+            const password = data.password;
+            
+            // Check minimum length
+            if (password.length < 6) {
+                isValid = false;
+                errors.push('Password must be at least 6 characters long.');
+            }
+            
+            // Check for lowercase letter
+            if (!/[a-z]/.test(password)) {
+                isValid = false;
+                errors.push('Password must contain at least one lowercase letter.');
+            }
+            
+            // Check for uppercase letter
+            if (!/[A-Z]/.test(password)) {
+                isValid = false;
+                errors.push('Password must contain at least one uppercase letter.');
+            }
+            
+            // Check for number
+            if (!/[0-9]/.test(password)) {
+                isValid = false;
+                errors.push('Password must contain at least one number.');
+            }
+            
+            // Check for special character
+            if (!/[^a-zA-Z0-9]/.test(password)) {
+                isValid = false;
+                errors.push('Password must contain at least one special character.');
+            }
         }
         
         // Birthday validation if provided
@@ -133,15 +241,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (isNaN(birthdayDate.getTime())) {
                     isValid = false;
                     errors.push('Please enter a valid birth date.');
-                } else {
-                    // Check if the user is at least 18 years old (optional)
-                    // const minAge = 18;
-                    // const today = new Date();
-                    // const minAgeDate = new Date(today.getFullYear() - minAge, today.getMonth(), today.getDate());
-                    // if (birthdayDate > minAgeDate) {
-                    //     isValid = false;
-                    //     errors.push(`You must be at least ${minAge} years old.`);
-                    // }
                 }
             }
         }

@@ -18,6 +18,7 @@ if (!defined('_PS_VERSION_')) {
 
 require_once _PS_MODULE_DIR_ . 'pslauth/classes/PSLAuthSocialProvider.php';
 require_once _PS_MODULE_DIR_ . 'pslauth/classes/PSLAuthGoogleProvider.php';
+require_once _PS_MODULE_DIR_ . 'pslauth/classes/PSLAuthAppleProvider.php';
 
 class PSLAuthCallbackModuleFrontController extends ModuleFrontController
 {
@@ -50,7 +51,7 @@ class PSLAuthCallbackModuleFrontController extends ModuleFrontController
         }
         
         // Validate required parameters
-        if (empty($provider) || empty($code)) {
+        if (empty($provider)) {
             $this->errors[] = $this->trans('Invalid authentication request', [], 'Modules.Pslauth.Shop');
             $this->redirectWithNotifications($this->context->link->getModuleLink('pslauth', 'login'));
             return;
@@ -58,7 +59,17 @@ class PSLAuthCallbackModuleFrontController extends ModuleFrontController
         
         switch ($provider) {
             case 'google':
+                if (empty($code)) {
+                    $this->errors[] = $this->trans('Invalid authentication request', [], 'Modules.Pslauth.Shop');
+                    $this->redirectWithNotifications($this->context->link->getModuleLink('pslauth', 'login'));
+                    return;
+                }
                 $this->processGoogleCallback($code);
+                break;
+            
+            case 'apple':
+                // Apple returns code in POST data after form_post response_mode
+                $this->processAppleCallback($code);
                 break;
             
             default:
@@ -141,6 +152,97 @@ class PSLAuthCallbackModuleFrontController extends ModuleFrontController
         } catch (Exception $e) {
             // Log the error
             PrestaShopLogger::addLog('Google authentication error: ' . $e->getMessage(), 3);
+            
+            // Show error to user
+            $this->errors[] = $this->trans('An error occurred during authentication: %error%', ['%error%' => $e->getMessage()], 'Modules.Pslauth.Shop');
+            $this->redirectWithNotifications($this->context->link->getModuleLink('pslauth', 'login'));
+        }
+    }
+    
+    /**
+     * Process Apple login callback
+     * 
+     * @param string $code Authorization code (optional, may be in POST)
+     */
+    protected function processAppleCallback($code)
+    {
+        $provider = new PSLAuthAppleProvider();
+        
+        if (!$provider->isEnabled()) {
+            $this->errors[] = $this->trans('Apple login is not enabled', [], 'Modules.Pslauth.Shop');
+            $this->redirectWithNotifications($this->context->link->getModuleLink('pslauth', 'login'));
+            return;
+        }
+        
+        try {
+            // If code is not provided, try to get it from POST data (Apple uses form_post response_mode)
+            if (empty($code) && isset($_POST['code'])) {
+                $code = $_POST['code'];
+            }
+            
+            // Verify we have a code
+            if (empty($code)) {
+                $this->errors[] = $this->trans('Invalid authentication request', [], 'Modules.Pslauth.Shop');
+                $this->redirectWithNotifications($this->context->link->getModuleLink('pslauth', 'login'));
+                return;
+            }
+            
+            // Get user data using the authorization code
+            $userData = $provider->getUserDataFromCode($code);
+            
+            if (!$userData) {
+                $this->errors[] = $this->trans('Failed to get user data from Apple', [], 'Modules.Pslauth.Shop');
+                $this->redirectWithNotifications($this->context->link->getModuleLink('pslauth', 'login'));
+                return;
+            }
+            
+            // Log user data for debugging (in development environment only)
+            if (_PS_MODE_DEV_) {
+                PrestaShopLogger::addLog('Apple user data: ' . json_encode($userData), 1);
+            }
+            
+            // Process login with user data
+            $customer = $provider->processLogin($userData);
+            
+            if (!$customer) {
+                $this->errors[] = $this->trans('Failed to create or log in user', [], 'Modules.Pslauth.Shop');
+                $this->redirectWithNotifications($this->context->link->getModuleLink('pslauth', 'login'));
+                return;
+            }
+            
+            // Log in the customer
+            $this->context->updateCustomer($customer);
+            Hook::exec('actionAuthentication', ['customer' => $this->context->customer]);
+            
+            // Update cart for this customer
+            $this->context->cart->id_customer = $customer->id;
+            $this->context->cart->secure_key = $customer->secure_key;
+            $this->context->cart->save();
+            $this->context->cookie->id_cart = (int) $this->context->cart->id;
+            $this->context->cookie->write();
+            $this->context->cart->autosetProductAddress();
+            
+            // Success message
+            $this->success[] = $this->trans('Successfully logged in with Apple', [], 'Modules.Pslauth.Shop');
+            
+            // Determine redirect URL
+            $redirectUrl = $this->context->link->getPageLink('my-account');
+            
+            // Check if we have a stored back URL
+            if (isset($this->context->cookie->pslauth_back_url)) {
+                $back = $this->context->cookie->pslauth_back_url;
+                $this->context->cookie->pslauth_back_url = null;
+                
+                // Validate the URL to prevent open redirect vulnerabilities
+                if (Validate::isUrl($back) && strpos($back, Tools::getShopDomain()) !== false) {
+                    $redirectUrl = $back;
+                }
+            }
+            
+            Tools::redirect($redirectUrl);
+        } catch (Exception $e) {
+            // Log the error
+            PrestaShopLogger::addLog('Apple authentication error: ' . $e->getMessage(), 3);
             
             // Show error to user
             $this->errors[] = $this->trans('An error occurred during authentication: %error%', ['%error%' => $e->getMessage()], 'Modules.Pslauth.Shop');
